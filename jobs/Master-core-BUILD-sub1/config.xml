@@ -1,0 +1,25 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>export BOOTSTRAP_HOME=&quot;/var/lib/jenkins/workspace/BootStrap_SCM_BUILD_Pipeline/bootstrap-linux&quot;
+pwd
+master_core_home1=../master-core-worktree1
+cd ${master_core_home1} 
+${BOOTSTRAP_HOME}/mvn-iib.sh -Pbuild -pl FCL_AdapterFramework_MasterTest
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

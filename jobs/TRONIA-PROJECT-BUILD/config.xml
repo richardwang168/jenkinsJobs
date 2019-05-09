@@ -1,0 +1,135 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.32">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.3.8"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.3.8">
+      <jobProperties/>
+      <triggers/>
+      <parameters/>
+      <options/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>DOMAIN_CONFIG_FILE</name>
+          <description></description>
+          <defaultValue>release-tronia-3.0-SNAPSHOT.yml</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <org.biouno.unochoice.ChoiceParameter plugin="uno-choice@2.1">
+          <name>APPLICATION_LIST</name>
+          <description></description>
+          <randomName>choice-parameter-23548533644326</randomName>
+          <visibleItemCount>1</visibleItemCount>
+          <script class="org.biouno.unochoice.model.GroovyScript">
+            <secureScript plugin="script-security@1.58">
+              <script>@GrabResolver(name=&apos;snakeyaml&apos;, root=&apos;https://mvnrepository.com/artifact/org.yaml/snakeyaml&apos;)
+@Grab(group=&apos;org.yaml&apos;, module=&apos;snakeyaml&apos;, version=&apos;1.24&apos;)
+
+import org.yaml.snakeyaml.*
+import org.yaml.snakeyaml.constructor.*
+import groovy.transform.*
+
+try {
+    InputStream input = new FileInputStream(new File(&quot;/var/lib/jenkins/repositories/iib/release-tronia-3.0-SNAPSHOT.yml&quot;));
+    Yaml yaml = new Yaml();
+	def appList = [];
+	Map&lt;String, Object&gt; object = (Map&lt;String, Object&gt;) yaml.load(input);
+	appMapList = object[&apos;applications&apos;]
+	appMapList.each { oneApp -&gt;
+		//println &quot;${oneApp[&apos;appName&apos;]}&quot;
+		appList.add(&quot;${oneApp[&apos;appName&apos;]}&quot;)		
+	}	
+	return appList
+} catch (Exception e) {
+	println(e)
+}
+</script>
+              <sandbox>false</sandbox>
+            </secureScript>
+            <secureFallbackScript plugin="script-security@1.58">
+              <script></script>
+              <sandbox>false</sandbox>
+            </secureFallbackScript>
+          </script>
+          <projectName>TRONIA-PROJECT-BUILD</projectName>
+          <choiceType>PT_CHECKBOX</choiceType>
+          <filterable>false</filterable>
+          <filterLength>1</filterLength>
+        </org.biouno.unochoice.ChoiceParameter>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.67">
+    <script>pipeline {
+    agent any
+    environment {
+        PATH=&quot;/var/lib/jenkins/workspace/BootStrap_SCM_BUILD_Pipeline/iib-bootstrap/ant-iib-bootstrap:$PATH&quot;
+        WORKSPACE_HOME = &quot;/var/lib/jenkins/workspace&quot;
+        WORKTREES_HOME = &quot;/var/lib/jenkins/worktrees&quot;
+        IIB_REPO_HOME = &quot;/var/lib/jenkins/repositories&quot;
+        BOOTSTRAP_HOME = &quot;/var/lib/jenkins/workspace/BootStrap_SCM_BUILD_Pipeline/iib-bootstrap/ant-iib-bootstrap&quot;
+        SCRIPT_PATH = &quot;${BOOTSTRAP_HOME}/mvn-iib.sh&quot;
+        DOMAIN =&quot;&quot;
+        def autoCancelled = false
+    }
+
+    stages {
+        stage (&quot;prepare&quot;) {
+            steps {
+                script {
+                    def exists = fileExists(&quot;${IIB_REPO_HOME}/iib/${DOMAIN_CONFIG_FILE}&quot;)
+                    if (exists) {
+                        CONFIG = readYaml file: &quot;${IIB_REPO_HOME}/iib/${DOMAIN_CONFIG_FILE}&quot;
+                        echo &quot;The application domain is: ${CONFIG.domain.domainName} &quot;
+                        DOMAIN = &quot;${WORKSPACE_HOME}/${CONFIG.domain.domainName}&quot;
+                        echo &quot;DOMAIN=${DOMAIN}&quot;
+                    } else {
+                        echo &quot;No configuration file ${IIB_REPO_HOME}/iib/${DOMAIN_CONFIG_FILE} was found, please try again after you create and make sure it&apos;s accessable.&quot;
+                        autoCancelled = true
+                        error(&apos;Aborting the build.&apos;)
+                    }
+                }
+            }
+
+        }
+        stage(&quot;Build&quot;) {
+            steps {
+                dir ( &quot;${DOMAIN}&quot; ) {
+                    script {
+            def appList = &quot;${params.APPLICATION_LIST}&quot;.split(&apos;,&apos;)
+                        try {
+                            appList.each { appName -&gt;
+                            println &quot;APP_NAME=${appName}&quot;
+                            rc = sh(script: &quot;${SCRIPT_PATH} -Pbuild -pl ${appName}&quot;, returnStatus: true)
+                            // check exit code
+                            sh &quot;echo \&quot;exit code is : ${rc}\&quot;&quot;
+                            if (rc != 0){
+                              autoCancelled = true
+                              error(&apos;Aborting the build due to none-zero return code.&apos;)
+                            }
+                          }
+                        }catch(err){
+                            if (autoCancelled) {
+                                currentBuild.result = &apos;FAILURE&apos;
+                                // return here instead of throwing error to keep the build &quot;RED&quot;
+                                return
+                            }
+                        }finally{
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

@@ -1,0 +1,73 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.31">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.3.4.1"/>
+  </actions>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.63">
+    <script>pipeline {
+	agent any
+	environment {
+        def workspace = pwd()
+        BOOTSTRAP_HOME = &quot;${workspace}/../BootStrap_SCM_BUILD_Pipeline/bootstrap-linux&quot;
+    }
+    
+	stages {
+	    stage(&apos;Preparation from SCM&apos;) { // for display purposes
+			steps {
+				checkout([$class: &apos;GitSCM&apos;,
+					branches: [[name: &apos;origin/master-core-RW&apos;]],
+					extensions: [[$class: &apos;WipeWorkspace&apos;]],
+					userRemoteConfigs: [[url: &apos;git@bitbucket.org:fclweb/iib.git&apos;]]
+				])
+			}
+	    }
+        stage(&apos;Build-worktrees&apos;) {
+			steps {
+				sh &quot;pwd&quot;
+				sh &quot;git worktree add -b master-core-1 ../master-core-worktree1 origin/master-core-RW&quot; 
+				sh &quot;git worktree add -b master-core-2 ../master-core-worktree2 origin/master-core-RW&quot; 
+			}
+        }
+        
+		stage(&quot;Run building in parallel&quot;) {
+			parallel {
+				stage(&quot;master-core-worktree1&quot;) {
+					steps {
+						build &apos;Master-core-BUILD-sub1&apos;
+					}
+				}
+				stage (&quot;master-core-worktree2&quot;) {
+					steps {
+						build &apos;Master-core-BUILD-sub2&apos;
+					}
+				}
+			}
+		}
+		stage(&apos;CLean-up-worktrees&apos;) {
+			steps {
+				sh &apos;cd&apos;
+				sh &apos;pwd&apos;
+				sh &apos;rm -rf ../master-core-worktree1&apos;
+				sh &apos;rm -rf ../master-core-worktree2&apos;
+				sh &apos;git worktree prune&apos;
+				sh &apos;git branch -D master-core-1&apos;
+				sh &apos;git branch -D master-core-2&apos;
+
+			}
+		}
+	}
+		
+    post {
+        always {
+            echo &quot;Master Core build is done with master-core-worktree1 and master-core-worktree1, respectively&quot;
+        }
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

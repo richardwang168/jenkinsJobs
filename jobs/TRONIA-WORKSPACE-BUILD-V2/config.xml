@@ -1,0 +1,253 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.32">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.3.8"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.3.8">
+      <jobProperties/>
+      <triggers/>
+      <parameters>
+        <string>CLEAN_WORKSPACE</string>
+        <string>CLEAN_WORKTREES</string>
+        <string>DOMAIN_CONFIG_FILE</string>
+      </parameters>
+      <options/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>DOMAIN_CONFIG_FILE</name>
+          <description>A master-level configuration file for all domain building tasks.</description>
+          <defaultValue>release-tronia-3.0-SNAPSHOT.yml</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>CLEAN_WORKSPACE</name>
+          <description>Clean-Up workspace before building</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>CLEAN_WORKTREES</name>
+          <description>Clean-Up related working trees, local branches before building</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.67">
+    <script>pipeline {
+    agent any
+    environment {
+        def workspace = pwd()
+        def CONFIG = &quot;&quot;
+        def autoCancelled = false
+        REPO_URI = &quot;git@bitbucket.org:fclweb/iib.git&quot;
+        WORKSPACE_HOME = &quot;/var/lib/jenkins/workspace&quot;
+        WORKTREES_HOME = &quot;/var/lib/jenkins/worktrees&quot;
+        IIB_REPO_HOME = &quot;/var/lib/jenkins/repositories&quot;
+        BOOTSTRAP_HOME = &quot;/var/lib/jenkins/workspace/BootStrap_SCM_BUILD_Pipeline/iib-bootstrap/ant-iib-bootstrap&quot;
+    }
+    parameters {
+        string(name: &apos;DOMAIN_CONFIG_FILE&apos;, defaultValue: &apos;release-tronia-3.0-SNAPSHOT.yml&apos;, description: &apos;A master-level configuration file for all domain building tasks.&apos;)
+        booleanParam(defaultValue: true, description: &apos;Clean-Up workspace before building&apos;, name: &apos;CLEAN_WORKSPACE&apos;)
+        booleanParam(defaultValue: true, description: &apos;Clean-Up related working trees, local branches before building&apos;, name: &apos;CLEAN_WORKTREES&apos;)
+    }
+    
+    stages {
+        stage (&quot;Init IIB master repository&quot;) {
+            steps {
+                sh &apos;&apos;&apos;
+                    if [ -d &quot;${IIB_REPO_HOME}/iib&quot; ]; then 
+                        cd &quot;${IIB_REPO_HOME}/iib&quot;
+                        if [ $(git rev-parse --is-inside-work-tree) = true ]; then
+                            echo &quot;IIB git local repository is already there, let&apos;s get it synchronized.&quot;
+                            git reset --hard
+                            git clean -fdx
+                            git pull
+                        fi
+                    else
+                        echo &quot;IIB git local repository does not exist, clone it from remote BitBucket repository.&quot;
+                        if [ ! -d &quot;${IIB_REPO_HOME}&quot; ]; then 
+                            mkdir -p &quot;${IIB_REPO_HOME}&quot;
+                        fi
+                        
+                        cd &quot;${IIB_REPO_HOME}&quot;
+                        git clone &quot;${REPO_URI}&quot; 
+                    fi
+                &apos;&apos;&apos;
+            }
+        }
+        stage (&quot;Check configuration file&quot; ) {
+            steps {
+                script {
+                    def exists = fileExists(&quot;${IIB_REPO_HOME}/iib/${DOMAIN_CONFIG_FILE}&quot;)
+                    if (exists) {
+                        CONFIG = readYaml file: &quot;${IIB_REPO_HOME}/iib/${DOMAIN_CONFIG_FILE}&quot;
+                        echo &quot;The application domain is: ${CONFIG.domain.domainName} &quot;
+                    } else {
+                        echo &quot;No configuration file ${IIB_REPO_HOME}/iib/${DOMAIN_CONFIG_FILE} was found, please try again after you create and make sure it&apos;s accessible.&quot;
+                        autoCancelled = true
+                        error(&apos;Aborting the build.&apos;)
+                    }
+                }
+            }
+        }
+
+        stage (&quot;Clean-up workspace&quot;) {
+        
+            when {
+                expression { params.CLEAN_WORKSPACE == true }
+            }
+            
+            steps {        
+                echo &quot;Application domain is:${CONFIG.domain.domainName}&quot;
+                dir (&quot;${WORKSPACE_HOME}&quot;) {
+                    sh &quot;&quot;&quot;
+                        if [ -d &quot;${CONFIG.domain.domainName}&quot; ]; then
+                            echo &quot;WORKSPACE for ${CONFIG.domain.domainName} exist, delete it.&quot;
+                            rm -rf ${CONFIG.domain.domainName}
+                        else
+                            echo &quot;No workspace for ${CONFIG.domain.domainName} was found.&quot;
+                        fi
+                    &quot;&quot;&quot;
+                }
+            }
+        }    
+
+        stage (&quot;Build WORKSPACE&quot;) {
+            steps {
+                echo &quot;Application domain is: ${CONFIG.domain.domainName}&quot;
+                dir (&quot;${WORKSPACE_HOME}&quot;) {
+                    sh &quot;&quot;&quot;
+                        if [ -d &quot;${CONFIG.domain.domainName}&quot; ]; then
+                            echo &quot;WORKSPACE for ${CONFIG.domain.domainName} exist, continue using it.&quot;
+                        else
+                            echo &quot;Create a new workspace with DOMAIN NAME: ${CONFIG.domain.domainName}&quot;
+                            mkdir &quot;${CONFIG.domain.domainName}&quot;
+                        fi
+                    &quot;&quot;&quot;
+                }
+            }
+        }
+        stage (&quot;Clean-up worktrees and local branches&quot;) {
+        
+            when {
+                expression { params.CLEAN_WORKTREES == true }
+            }
+            
+            steps {    
+                script {
+                    try {
+                        CONFIG.worktrees.each { wt -&gt; 
+                            echo &quot;worktreeName:${wt.worktreeName}&quot;
+                            echo &quot;remote branch:${wt.remoteBranch}&quot;
+                            echo &quot;local branch:${wt.localBranch}&quot;
+                            echo &quot;local path:${wt.localPath}&quot;
+                            
+                            dir (&quot;${IIB_REPO_HOME}/iib&quot;) {
+                                echo &quot;Remove working tree ${wt.worktreeName}&quot;
+                                sh &quot;&quot;&quot;
+                                    if git worktree list | grep ${WORKTREES_HOME}/${wt.localPath} &amp;&gt; /dev/null; then 
+                                        git worktree remove --force ${WORKTREES_HOME}/${wt.localPath}
+                                    fi
+                                    if git branch | grep ${wt.localBranch} &amp;&gt; /dev/null; then
+                                        git branch -D ${wt.localBranch}
+                                    fi
+                                &quot;&quot;&quot;
+                            }
+                        }
+                    }catch (all) {
+                        throw all
+                    } finally {
+                        currentBuild.result = &apos;SUCCESS&apos;
+                    }
+                }
+            }
+        }
+        
+        stage (&quot;Build worktrees and wire with workspace&quot;) {
+            steps {                
+                script {
+                    CONFIG.worktrees.each { wt -&gt; 
+                        echo &quot;worktreeName:${wt.worktreeName}&quot;
+                        echo &quot;remote branch:${wt.remoteBranch}&quot;
+                        echo &quot;local branch:${wt.localBranch}&quot;
+                        echo &quot;local path:${wt.localPath}&quot;
+                        sh &quot;cd ${WORKTREES_HOME}&quot;
+                        def exists = fileExists(&quot;${WORKTREES_HOME}/${wt.localPath}&quot;)
+                        if (exists) {
+                            dir (&quot;${WORKTREES_HOME}/${wt.localPath}&quot; ) {
+                                sh &apos;&apos;&apos;
+                                    if [ $(git rev-parse --is-inside-work-tree) = true ]; then
+                                        echo &quot;Working tree is already there, let&apos;s get it synchronized.&quot;
+                                        git reset --hard
+                                        git clean -fdx
+                                        git pull
+                                    fi
+                                &apos;&apos;&apos;    
+                            }
+                        } else {
+                            dir (&quot;${IIB_REPO_HOME}/iib&quot;) {
+                                echo &quot;Working tree does not exist, add it from remote BitBucket repository.&quot;
+                                sh &quot;git worktree add -b ${wt.localBranch} ${WORKTREES_HOME}/${wt.localPath} ${wt.remoteBranch}&quot;
+                            }
+                        }
+                        sh &quot;cp -prf ${WORKTREES_HOME}/${wt.localPath}/* ${WORKSPACE_HOME}/${CONFIG.domain.domainName}&quot;
+                    } 
+                }
+            }
+        }
+        stage (&quot;Install and deploy domain parent pom.xml files&quot;) {
+            steps {
+                script {
+                    dir (&quot;${BOOTSTRAP_HOME}&quot; ) {
+                        def exists_domainPom = fileExists(&quot;${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${CONFIG.domain.domainPom}/pom.xml&quot;)
+                        if (exists_domainPom) {
+                            sh &quot;${BOOTSTRAP_HOME}/ant-iib.sh -DdomainPomFileName=${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${CONFIG.domain.domainPom}/pom.xml setup-install-domain-pom&quot;
+                            sh &quot;${BOOTSTRAP_HOME}/ant-iib.sh -DdomainPomFileName=${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${CONFIG.domain.domainPom}/pom.xml setup-deploy-domain-pom&quot;
+                        } else {
+                            echo &quot;No domain-level parent pom.xml file found.&quot;
+                        }
+                        def exists_domainPomJava = fileExists(&quot;${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${CONFIG.domain.domainPomJava}/pom.xml&quot;)
+                        if (exists_domainPomJava) {
+                            sh &quot;${BOOTSTRAP_HOME}/ant-iib.sh -DdomainPomFileName=${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${CONFIG.domain.domainPomJava}/pom.xml setup-install-domain-pom&quot;
+                            sh &quot;${BOOTSTRAP_HOME}/ant-iib.sh -DdomainPomFileName=${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${CONFIG.domain.domainPomJava}/pom.xml setup-deploy-domain-pom&quot;
+                        } else {
+                            echo &quot;No domain-level parent pom.xml file for Java found.&quot;
+                        }
+                    }
+                }
+                script {
+                    CONFIG.worktrees.each { wt -&gt; 
+                        echo &quot;IIB APP PARENT POM: ${wt.mvnPom}&quot;
+                        echo &quot;IIB APP PARENT POM for JAVA: ${wt.mvnPomJava}&quot;
+                        dir (&quot;${BOOTSTRAP_HOME}&quot; ) {
+                            def exists_pom = fileExists(&quot;${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${wt.mvnPom}/pom.xml&quot;)
+                            if (exists_pom) {
+                                sh &quot;${BOOTSTRAP_HOME}/ant-iib.sh -DdomainPomFileName=${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${wt.mvnPom}/pom.xml setup-install-domain-pom&quot;
+                                sh &quot;${BOOTSTRAP_HOME}/ant-iib.sh -DdomainPomFileName=${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${wt.mvnPom}/pom.xml setup-deploy-domain-pom&quot;
+                            } else {
+                                echo &quot;No application-level parent pom.xml file found.&quot;
+                            }
+                            def exists_pomJava = fileExists(&quot;${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${wt.mvnPomJava}/pom.xml&quot;)
+                            if (exists_pomJava) {
+                                sh &quot;${BOOTSTRAP_HOME}/ant-iib.sh -DdomainPomFileName=${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${wt.mvnPomJava}/pom.xml setup-install-domain-pom&quot;
+                                sh &quot;${BOOTSTRAP_HOME}/ant-iib.sh -DdomainPomFileName=${WORKSPACE_HOME}/${CONFIG.domain.domainName}/${wt.mvnPomJava}/pom.xml setup-deploy-domain-pom&quot;
+                            } else {
+                                echo &quot;No application-level parent pom.xml file for Java found.&quot;
+                            }
+                        }
+                    } 
+                }
+            }
+        }
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

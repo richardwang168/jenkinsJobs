@@ -1,0 +1,55 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.31">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.3.4.1"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.3.4.1">
+      <jobProperties/>
+      <triggers/>
+      <parameters/>
+      <options/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.63">
+    <script>pipeline {
+    agent any
+	environment {
+		PATH=&quot;/var/lib/jenkins/workspace/BootStrap_SCM_BUILD_Pipeline/bootstrap-linux:$PATH&quot;
+		def autoCancelled = false
+	}
+    stages {
+        stage(&quot;Build&quot;) {
+            steps {
+				dir (&quot;../RELEASE-TRONIA-3.0-SNAPSHOT&quot;) {
+					script {
+						SCRIPT_PATH = &quot;mvn-iib.sh -Pbuild -pl DBLogger&quot;
+						try {
+							rc = sh(script: &quot;${SCRIPT_PATH}&quot;, returnStatus: true)
+							// check exit code
+							sh &quot;echo \&quot;exit code is : ${rc}\&quot;&quot;
+
+							if (rc != 0){ 
+									autoCancelled = true
+									error(&apos;Aborting the build due to none-zero return code.&apos;)
+							} 
+						}catch(err){
+							if (autoCancelled) {
+								currentBuild.result = &apos;FAILURE&apos;
+								// return here instead of throwing error to keep the build &quot;RED&quot;
+								return
+							}
+						}finally{
+						}
+					}
+				}
+            }
+        }
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>
