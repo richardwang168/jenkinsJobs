@@ -1,0 +1,1007 @@
+---
+domain:
+    projectRepoURL: git@bitbucket.org:fclweb/iib.git
+    projectName: OMS
+    projectParentGroupId: crs.fcl.integration.iib.pom
+    projectParentArtifactId: FCL_Maven_Pom
+    projectParentVersion: "1.0"
+    projectParentRelativePath: "../"
+    projectGroupId: crs.fcl.integration.pom
+    projectArtifactId: FCL_OMSMaven_Pom
+    projectVersion:    "3.2"
+    projectAppsGroupId: crs.fcl.integration.iib.bar
+    toolkitWorkspaceName: master-oms-toolkit
+    combinedWorkspaceName: master-oms
+worktrees:
+    - worktreeName: release/core-1.2
+      branchName: release/core-1.2
+      worktreeCategory: ""
+      worktreeType: shared
+    - worktreeName: release/tms-3.0.1
+      branchName: release/tms-3.0.1
+      worktreeCategory: ""
+      worktreeType: shared
+    - worktreeName: release/pos-1.4
+      branchName: release/pos-1.4
+      worktreeCategory: ""
+      worktreeType: shared
+    - worktreeName: release/mi9-2.0
+      branchName: release/mi9-2.0
+      worktreeCategory: ""
+      worktreeType: shared
+    - worktreeName: release/oms-3.2
+      branchName: release/oms-3.2
+      worktreeCategory: ""
+      worktreeType: dedicated
+###########################################################################################
+# Following environments configuration is an example for how to configure DEV IIB environment,
+# you can configure TEST, QA, UAT or PROD in the same way for IIB 10 or ACE 11 for many
+# combinations, but in reality of FCL IIB 10, for each application domain, the maximum
+# number of integration nodes are two (in case of loadbalancing), and only one integration
+# server under each integration node.
+###########################################################################################
+aceEnvironments:
+    DEV:
+        hostName: fsr3vlesb
+        port: 22
+        proxyUser: iib
+        sshKeyName: iib@fsr3vlesb-id_rsa
+        iibVersion: 10.0.0.21
+        iibInstallPath: "/opt/IBM/iib-10.0.0.21"
+        workDir: /home/iib
+        integrationNodes:
+            - nodeName: DFIB01
+              queueManagerName: DFIB01
+              gatewayQueueManagerName: DFGW01
+              gatewayQMHostName: fsr3vlesb
+              gatewayQMHostPort: 22
+              gatewayQMProxyUser: iib
+              gatewayQMSshKeyName: iib@fsr3vlesb-id_rsa
+              requiredResources:
+              integrationServers:
+                  - serverName: CDR_Pub_01
+                  - serverName: CDR_Pub_02
+                  - serverName: CDR_Pub_03
+                  - serverName: WS_Pub_01
+                  - serverName: PMM_Pub_01
+                  - serverName: OMS_Pub_01
+                  - serverName: Priya_Pub_01
+                  - serverName: JDE_Pub_01
+                  - serverName: JDE_Sub_01
+                  - serverName: OMS_Sub_01
+                  - serverName: OMS_Sub_02
+                  - serverName: OMS_Sub_03
+                  - serverName: PMM_Sub_01
+                  - serverName: CDR_Sub_01
+                  - serverName: CDR_Sub_02
+                  - serverName: Priya_Sub_01
+                  - serverName: OTM_Pub_01
+                  - serverName: OTM_Sub_01
+                  - serverName: Mi9_Sub_01
+                  - serverName: REST_Pub_01
+    TEST:
+        hostName: fsr2vlesb1
+        port: 22
+        proxyUser: iib
+        sshKeyName: iib@fsr2vlesb1-id_rsa
+        iibVersion: 10.0.0.21
+        iibInstallPath: "/opt/IBM/iib-10.0.0.21"
+        workDir: /home/iib
+        integrationNodes:
+            - nodeName: TFIB01
+              queueManagerName: TFIB01
+              gatewayQueueManagerName: TFGW01
+              gatewayQMHostName: FSR2VLESBGW1
+              gatewayQMHostPort: 22
+              gatewayQMProxyUser: mqm
+              gatewayQMSshKeyName: mqm@fsr2vlesbgw1-id_rsa
+              requiredResources:
+              integrationServers:
+                  - serverName: CDR_Pub_01
+                  - serverName: CDR_Pub_02
+                  - serverName: CDR_Pub_03
+                  - serverName: WS_Pub_01
+                  - serverName: PMM_Pub_01
+                  - serverName: OMS_Pub_01
+                  - serverName: Priya_Pub_01
+                  - serverName: JDE_Pub_01
+                  - serverName: JDE_Sub_01
+                  - serverName: OMS_Sub_01
+                  - serverName: OMS_Sub_02
+                  - serverName: OMS_Sub_03
+                  - serverName: PMM_Sub_01
+                  - serverName: CDR_Sub_01
+                  - serverName: CDR_Sub_02
+                  - serverName: Priya_Sub_01
+                  - serverName: OTM_Pub_01
+                  - serverName: OTM_Sub_01
+                  - serverName: Mi9_Sub_01
+                  - serverName: REST_Pub_01
+    UAT_HA_11:
+        hostName: fsr6vlesbn11
+        port: 22
+        proxyUser: iib
+        sshKeyName: iib@fsr6vlesbn11-id_rsa
+        iibVersion: 10.0.0.21
+        iibInstallPath: "/opt/IBM/iib-10.0.0.21"
+        workDir: /home/iib
+        integrationNodes:
+            - nodeName: UFIB01
+              queueManagerName: UFIB01
+              gatewayQueueManagerName: UFGW01
+              gatewayQMHostName: fsr6vlesbmq1
+              gatewayQMHostPort: 22
+              gatewayQMProxyUser: mqm
+              gatewayQMSshKeyName: mqm@fsr6vlesbmq1-id_rsa
+              requiredResources:
+              integrationServers:
+                  - serverName: WS_Pub_01
+                  - serverName: CRSHub_Sub_01
+                  - serverName: REST_Pub_01
+                  - serverName: Priya_Pub_01
+    UAT_HA_12:
+        hostName: fsr6vlesbn12
+        port: 22
+        proxyUser: iib
+        sshKeyName: iib@fsr6vlesbn12-id_rsa
+        iibVersion: 10.0.0.21
+        iibInstallPath: "/opt/IBM/iib-10.0.0.21"
+        workDir: /home/iib
+        integrationNodes:
+            - nodeName: UFIB01
+              queueManagerName: UFIB01
+              gatewayQueueManagerName: UFGW01
+              gatewayQMHostName: fsr6vlesbmq1
+              gatewayQMHostPort: 22
+              gatewayQMProxyUser: mqm
+              gatewayQMSshKeyName: mqm@fsr6vlesbmq1-id_rsa
+              requiredResources:
+              integrationServers:
+                  - serverName: WS_Pub_01
+                  - serverName: CRSHub_Sub_01
+                  - serverName: REST_Pub_01
+                  - serverName: Priya_Pub_01
+    UAT_HA_21:
+        hostName: fsr6vlesbn21
+        port: 22
+        proxyUser: iib
+        sshKeyName: iib@fsr6vlesbn21-id_rsa
+        iibVersion: 10.0.0.21
+        iibInstallPath: "/opt/IBM/iib-10.0.0.21"
+        workDir: /home/iib
+        integrationNodes:
+            - nodeName: UFIB02
+              queueManagerName: UFIB02
+              gatewayQueueManagerName: UFGW01
+              gatewayQMHostName: fsr6vlesbmq1
+              gatewayQMHostPort: 22
+              gatewayQMProxyUser: mqm
+              gatewayQMSshKeyName: mqm@fsr6vlesbmq1-id_rsa
+              requiredResources:
+              integrationServers:
+                  - serverName: LandingDB_Pub_01
+                  - serverName: LandingDB_Pub_02
+                  - serverName: CDR_Pub_01
+                  - serverName: CDR_Pub_02
+                  - serverName: CDR_Pub_03
+                  - serverName: WS_Pub_01
+                  - serverName: PMM_Pub_01
+                  - serverName: OMS_Pub_01
+                  - serverName: Priya_Pub_01
+                  - serverName: JDE_Pub_01
+                  - serverName: JDE_Sub_01
+                  - serverName: OMS_Sub_01
+                  - serverName: OMS_Sub_02
+                  - serverName: OMS_Sub_03
+                  - serverName: PMM_Sub_01
+                  - serverName: CDR_Sub_01
+                  - serverName: CDR_Sub_02
+                  - serverName: Priya_Sub_01
+                  - serverName: OTM_Pub_01
+                  - serverName: OTM_Sub_01
+                  - serverName: Mi9_Sub_01
+                  - serverName: REST_Pub_01
+    UAT_HA_22:
+        hostName: fsr6vlesbn22
+        port: 22
+        proxyUser: iib
+        sshKeyName: iib@fsr6vlesbn22-id_rsa
+        iibVersion: 10.0.0.21
+        iibInstallPath: "/opt/IBM/iib-10.0.0.21"
+        workDir: /home/iib
+        integrationNodes:
+            - nodeName: UFIB02
+              queueManagerName: UFIB02
+              gatewayQueueManagerName: UFGW01
+              gatewayQMHostName: fsr6vlesbmq1
+              gatewayQMHostPort: 22
+              gatewayQMProxyUser: mqm
+              gatewayQMSshKeyName: mqm@fsr6vlesbmq1-id_rsa
+              requiredResources:
+              integrationServers:
+                  - serverName: LandingDB_Pub_01
+                  - serverName: LandingDB_Pub_02
+                  - serverName: CDR_Pub_01
+                  - serverName: CDR_Pub_02
+                  - serverName: CDR_Pub_03
+                  - serverName: WS_Pub_01
+                  - serverName: PMM_Pub_01
+                  - serverName: OMS_Pub_01
+                  - serverName: Priya_Pub_01
+                  - serverName: JDE_Pub_01
+                  - serverName: JDE_Sub_01
+                  - serverName: OMS_Sub_01
+                  - serverName: OMS_Sub_02
+                  - serverName: OMS_Sub_03
+                  - serverName: PMM_Sub_01
+                  - serverName: CDR_Sub_01
+                  - serverName: CDR_Sub_02
+                  - serverName: Priya_Sub_01
+                  - serverName: OTM_Pub_01
+                  - serverName: OTM_Sub_01
+                  - serverName: Mi9_Sub_01
+                  - serverName: REST_Pub_01
+    PROD_HA_11:
+        hostName: fsr1vlesbn11
+        port: 22
+        proxyUser: iib
+        sshKeyName: iib@fsr1vlesbn11-id_rsa
+        iibVersion: 10.0.0.21
+        iibInstallPath: "/opt/IBM/iib-10.0.0.21"
+        workDir: /home/iib
+        integrationNodes:
+            - nodeName: PFIB01
+              queueManagerName: PFIB01
+              gatewayQueueManagerName: PFGW01
+              gatewayQMHostName: fsr1vlesbmq1
+              gatewayQMHostPort: 22
+              gatewayQMProxyUser: mqm
+              gatewayQMSshKeyName: mqm@fsr1vlesbmq1-id_rsa
+              requiredResources:
+              integrationServers:
+                  - serverName: WS_Pub_01
+                  - serverName: CRSHub_Sub_01
+                  - serverName: REST_Pub_01
+    PROD_HA_12:
+        hostName: fsr1vlesbn12
+        port: 22
+        proxyUser: iib
+        sshKeyName: iib@fsr1vlesbn12-id_rsa
+        iibVersion: 10.0.0.21
+        iibInstallPath: "/opt/IBM/iib-10.0.0.21"
+        workDir: /home/iib
+        integrationNodes:
+            - nodeName: PFIB01
+              queueManagerName: PFIB01
+              gatewayQueueManagerName: PFGW01
+              gatewayQMHostName: fsr1vlesbmq1
+              gatewayQMHostPort: 22
+              gatewayQMProxyUser: mqm
+              gatewayQMSshKeyName: mqm@fsr1vlesbmq1-id_rsa
+              requiredResources:
+              integrationServers:
+                  - serverName: WS_Pub_01
+                  - serverName: CRSHub_Sub_01
+                  - serverName: REST_Pub_01
+    PROD_HA_21:
+        hostName: fsr1vlesbn21
+        port: 22
+        proxyUser: iib
+        sshKeyName: iib@fsr1vlesbn21-id_rsa
+        iibVersion: 10.0.0.21
+        iibInstallPath: "/opt/IBM/iib-10.0.0.21"
+        workDir: /home/iib
+        integrationNodes:
+            - nodeName: PFIB02
+              queueManagerName: PFIB02
+              gatewayQueueManagerName: PFGW01
+              gatewayQMHostName: fsr1vlesbmq1
+              gatewayQMHostPort: 22
+              gatewayQMProxyUser: mqm
+              gatewayQMSshKeyName: mqm@fsr1vlesbmq1-id_rsa
+              requiredResources:
+              integrationServers:
+                  - serverName: LandingDB_Pub_01
+                  - serverName: LandingDB_Pub_02
+                  - serverName: CDR_Pub_01
+                  - serverName: CDR_Pub_02
+                  - serverName: CDR_Pub_03
+                  - serverName: WS_Pub_01
+                  - serverName: PMM_Pub_01
+                  - serverName: OMS_Pub_01
+                  - serverName: Priya_Pub_01
+                  - serverName: JDE_Pub_01
+                  - serverName: JDE_Sub_01
+                  - serverName: OMS_Sub_01
+                  - serverName: OMS_Sub_02
+                  - serverName: OMS_Sub_03
+                  - serverName: PMM_Sub_01
+                  - serverName: CDR_Sub_01
+                  - serverName: CDR_Sub_02
+                  - serverName: Priya_Sub_01
+                  - serverName: OTM_Pub_01
+                  - serverName: OTM_Sub_01
+                  - serverName: Mi9_Sub_01
+                  - serverName: REST_Pub_01
+    PROD_HA_22:
+        hostName: fsr1vlesbn22
+        port: 22
+        proxyUser: iib
+        sshKeyName: iib@fsr1vlesbn22-id_rsa
+        iibVersion: 10.0.0.21
+        iibInstallPath: "/opt/IBM/iib-10.0.0.21"
+        workDir: /home/iib
+        integrationNodes:
+            - nodeName: PFIB02
+              queueManagerName: PFIB02
+              gatewayQueueManagerName: PFGW01
+              gatewayQMHostName: fsr1vlesbmq1
+              gatewayQMHostPort: 22
+              gatewayQMProxyUser: mqm
+              gatewayQMSshKeyName: mqm@fsr1vlesbmq1-id_rsa
+              requiredResources:
+              integrationServers:
+                  - serverName: LandingDB_Pub_01
+                  - serverName: LandingDB_Pub_02
+                  - serverName: CDR_Pub_01
+                  - serverName: CDR_Pub_02
+                  - serverName: CDR_Pub_03
+                  - serverName: WS_Pub_01
+                  - serverName: PMM_Pub_01
+                  - serverName: OMS_Pub_01
+                  - serverName: Priya_Pub_01
+                  - serverName: JDE_Pub_01
+                  - serverName: JDE_Sub_01
+                  - serverName: OMS_Sub_01
+                  - serverName: OMS_Sub_02
+                  - serverName: OMS_Sub_03
+                  - serverName: PMM_Sub_01
+                  - serverName: CDR_Sub_01
+                  - serverName: CDR_Sub_02
+                  - serverName: Priya_Sub_01
+                  - serverName: OTM_Pub_01
+                  - serverName: OTM_Sub_01
+                  - serverName: Mi9_Sub_01
+                  - serverName: REST_Pub_01
+#
+applications:
+ - appName: Arctic_StoreOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_01
+ - appName: CALF_Priya_Export_PreProc
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Pub_01
+ - appName: CALH_Priya_Export_PreProc
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Pub_01
+ - appName: CAL_Mainframe_InventoryUpdate_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_02
+ - appName: CA_PromotionMovement_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_03
+ - appName: Calgary_StoreOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: EDM_Mainframe_InventoryUpdate_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_02
+ - appName: EDM_Priya_Export_PreProc
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Pub_01
+ - appName: EOS_StoreOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_03
+ - appName: HQ_SuggestedRetailPrice_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_02
+ - appName: JDE_Common_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: JDE_InvoiceDetails_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: JDE_Pub_01
+ - appName: JDE_VendorToCustomerShipmentConfirmation_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: JDE_Pub_01
+ - appName: MF_InflightOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_03
+ - appName: MF_StoreOrderAck_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_03
+ - appName: Mainframe_InventoryUpdate_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_02
+ - appName: Mainframe_StockOnOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_03
+ - appName: Mi9_StoreOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_03
+ - appName: OMS_Common_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_Constants_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_CustomerMaster_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_CustomerSchedule_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_ItemBrand_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_ItemHierarchy_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_ItemVendor_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_OrderCancellation_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_OrderRelease_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_Order_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_PromotionCode_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_PurchaseOrderUpdate_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_STMOrderQuantity_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_STMOrderQuantity_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Pub_01
+ - appName: OMS_ShipmentClosure_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_ShipmentConfirmation_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_Simulator
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_StoreOrderAck_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_StoreOrder_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_UnSourceableStoreOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Pub_01
+ - appName: OMS_VendorMaster_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OMS_VendorPayable_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: OTM_CustomerSchedule_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OTM_Pub_01
+ - appName: OTM_DangerousGoodsEntity_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OTM_Pub_01
+ - appName: OTM_DangerousGoodsItem_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OTM_Pub_01
+ - appName: PMM_PurchaseOrderReference_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: PMM_Pub_01
+ - appName: PMM_PurchaseOrderUpdate_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: PMM_Pub_01
+ #- appName: PMM_StockOnOrder_Pub
+ #  appType: APP
+ #  appVersion: '3.2'
+ #  integrationServer: PMM_Pub_01
+ - appName: PMM_TransferOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: PMM_Pub_01
+ - appName: PriceLine_Lib
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: Priya_Export_PreProc
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: Priya_ReceiptConfirmation_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Pub_01
+ - appName: Priya_ShipmentClosure_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Pub_01
+ - appName: Priya_ShipmentConfirmation_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Pub_01
+ - appName: SAS_StoreOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_01
+ - appName: STN_Mainframe_InventoryUpdate_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_02
+ - appName: STN_Priya_Export_PreProc
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Pub_01
+ - appName: Sub_CustomerBill_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_CustomerMaster_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_01
+ - appName: Sub_CustomerSchedule_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_01
+ - appName: Sub_CustomerToDCReturn_Priya
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Sub_01
+ - appName: Sub_DangerousGoodsEntity_MF
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_01
+ - appName: Sub_DangerousGoodsEntity_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_DangerousGoodsEntity_Priya
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Sub_01
+ - appName: Sub_DangerousGoodsItem_MF
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_01
+ - appName: Sub_DangerousGoodsItem_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_DangerousGoodsItem_Priya
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Sub_01
+ - appName: Sub_InflightOrder_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_InventoryUpdate_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_01
+ - appName: Sub_InvoiceDetails_LBMX
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_01
+ - appName: Sub_InvoiceDetails_MF
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_02
+ - appName: Sub_InvoiceDetails_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_InvoiceDetails_SR
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: JDE_Sub_01
+ - appName: Sub_InvoiceRequest_JDE
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: JDE_Sub_01
+ - appName: Sub_InvoiceRequest_MF
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_01
+ - appName: Sub_InvoiceRequest_SR
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: JDE_Sub_01
+ - appName: Sub_ItemBrand_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02
+ - appName: Sub_ItemHierarchy_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_01
+ - appName: Sub_ItemHierarchy_JDE
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: JDE_Sub_01
+ - appName: Sub_ItemMaster_JDE
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: JDE_Sub_01
+ - appName: Sub_ItemMaster_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_01
+ - appName: Sub_ItemVendor_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_01
+ - appName: Sub_OrderAmountUpdate_JDE
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: JDE_Sub_01
+ - appName: Sub_OrderCancellation_MF
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_01
+ - appName: Sub_OrderCancellation_Mi9
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Mi9_Sub_01
+ - appName: Sub_OrderCancellation_SR
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: JDE_Sub_01
+ #- appName: Sub_OrderCompletion_JDE
+ #  appType: APP
+ #  appVersion: '3.2'
+ #  integrationServer: JDE_Sub_01
+ - appName: Sub_OrderUpdate_MF
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_01
+ - appName: Sub_OrderUpdate_Mi9
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Mi9_Sub_01
+ - appName: Sub_PlannedShipment_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_01
+ - appName: Sub_PromoPriceHeader_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02
+ - appName: Sub_PromoPriceLine_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_PromotionCode_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_PromotionMovement_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_PurchaseOrderReference_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02
+ - appName: Sub_PurchaseOrderRequest_PMM
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: PMM_Sub_01
+ - appName: Sub_PurchaseOrderUpdate_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02
+ - appName: Sub_ReceiptConfVendorToDC_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02
+ - appName: Sub_ReceiptConfirmation_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02,OMS_Sub_03
+ - appName: Sub_RegularPriceLine_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02
+ - appName: Sub_STMOrderQuantity_MF
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_02
+ - appName: Sub_SalesOrderRelease_OTM
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OTM_Sub_01
+ - appName: Sub_ShipmentClosure_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02
+ - appName: Sub_ShipmentClosure_PMM
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: PMM_Sub_01
+ - appName: Sub_ShipmentConfirmation_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_01
+ - appName: Sub_ShipmentConfirmation_OTM
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OTM_Sub_01
+ - appName: Sub_ShipmentConfirmation_PMM
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: PMM_Sub_01
+ - appName: Sub_StockOnOrder_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02
+ - appName: Sub_StoreLoad_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_StoreOrderAck_MFFormat_Common
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_01
+ - appName: Sub_StoreOrder_CommonFormat_History
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_02
+ - appName: Sub_StoreOrder_CommonFormat_MF
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_01
+ - appName: Sub_StoreOrder_CommonFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_01
+ - appName: Sub_StoreOrder_CommonFormat_SMTP
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_02
+ - appName: Sub_SuggestedRetailPrice_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_TicketLabel_MF
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Sub_02
+ - appName: Sub_TransferOrder_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02
+ - appName: Sub_UserLoad_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: Sub_VendorMaster_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_01
+ - appName: Sub_VendorPayable_MFFormat_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_02
+ - appName: Sub_VendorToCustomerShipmentConfirmation_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03
+ - appName: MIM_UserUpdate_OMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: OMS_Sub_03   
+ - appName: TGP_PromotionMovement_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_03
+ - appName: TGP_StoreOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_03
+ - appName: TRC_StoreOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_03
+ - appName: Mainframe_ProduceOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_03
+ - appName: TestHelperOMS
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: TestHelperOTM
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: TestHelpers
+   appType: JAR
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: TestOMS
+   appType: JAR
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: Tronia_StoreOrder_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: REST_Pub_01
+ - appName: WPG_Mainframe_InventoryUpdate_Pub
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: CDR_Pub_02
+ - appName: WPG_Priya_Export_PreProc
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: Priya_Pub_01
+ - appName: WS_CreditAuth
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: REST_Pub_01
+ - appName: WS_CreditAuthorization
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: WS_Pub_01
+ - appName: WS_CreditAuthorization_Simulator
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: WS_InventoryInquiry
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: WS_Pub_01
+ - appName: WS_InventoryInquiry_WSDL
+   appType: STATIC_LIB
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: WS_TaxAndFee
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: WS_Pub_01
+ - appName: WS_TaxAndFeeSearch
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: WS_Pub_01
+ - appName: WS_UserQuery
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: WS_Pub_01
+ - appName: WS_TaxAndFee_Simulator
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: fcl.ca.mf.MainframeInventoryUpdatePubPattern
+   appType: JAR
+   appVersion: '3.2'
+   integrationServer: '********'
+ - appName: Sub_OrderCompletion_JDE
+   appType: APP
+   appVersion: '3.2'
+   integrationServer: JDE_Sub_01
+sharedLibs:
+ - sharedLibName: InventoryUpdate_Lib
+   sharedLibVersion: '3.2'
+   referredBy:
+    - CAL_Mainframe_InventoryUpdate_Pub
+    - EDM_Mainframe_InventoryUpdate_Pub
+    - Mainframe_InventoryUpdate_Pub
+    - STN_Mainframe_InventoryUpdate_Pub
+    - WPG_Mainframe_InventoryUpdate_Pub
+   integrationServer: '********'
+ - sharedLibName: PriyaConfirmation_Lib
+   sharedLibVersion: '3.2'
+   referredBy:
+    - CALF_Priya_Export_PreProc
+    - CALH_Priya_Export_PreProc
+    - EDM_Priya_Export_PreProc
+    - Priya_Export_PreProc
+    - Priya_ReceiptConfirmation_Pub
+    - Priya_ShipmentClosure_Pub
+    - Priya_ShipmentConfirmation_Pub
+    - STN_Priya_Export_PreProc
+    - Sub_CustomerToDCReturn_Priya
+    - Sub_ReceiptConfirmation_OMS
+    - Sub_ShipmentClosure_OMS
+    - Sub_ShipmentConfirmation_OMS
+    - WPG_Priya_Export_PreProc
+   integrationServer: '********'
+ - sharedLibName: PromotionMovement_Lib
+   sharedLibVersion: '3.2'
+   referredBy:
+    - CA_PromotionMovement_Pub
+    - TGP_PromotionMovement_Pub
+   integrationServer: '********'
+ - sharedLibName: StoreOrder_Lib
+   sharedLibVersion: '3.2'
+   referredBy:
+    - Arctic_StoreOrder_Pub
+    - MF_StoreOrderAck_Pub
+    - TGP_StoreOrder_Pub
+    - TRC_StoreOrder_Pub
+    - Tronia_StoreOrder_Pub
+    - Mainframe_ProduceOrder_Pub
+   integrationServer: '********'
+ - sharedLibName: SuggestedRetailPrice_Lib
+   sharedLibVersion: '3.2'
+   referredBy:
+    - HQ_SuggestedRetailPrice_Pub
+   integrationServer: '********'
+ - sharedLibName: SequenceGenerator_Lib
+   sharedLibVersion: '3.2'
+   referredBy:
+    - Sub_ItemHierarchy_JDE
+    - Tronia_StoreOrder_Pub
+    - Arctic_StoreOrder_Pub
+    - TGP_StoreOrder_Pub
+    - TRC_StoreOrder_Pub
+    - Sub_DangerousGoodsEntity_MF
+    - Sub_DangerousGoodsItem_MF
+    - Sub_InvoiceDetails_MF
+   integrationServer: JDE_Sub_01
+ - sharedLibName: WS_CreditAuthorization_Lib
+   sharedLibVersion: '3.2'
+   referredBy:
+    - WS_CreditAuthorization
+    - WS_CreditAuthorization_Simulator
+   integrationServer: '********'
+ - sharedLibName: WS_TaxAndFee_Lib
+   sharedLibVersion: '3.2'
+   referredBy:
+    - WS_TaxAndFeeSearch
+    - WS_TaxAndFee_Simulator
+   integrationServer: '********'
